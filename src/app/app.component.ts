@@ -158,24 +158,6 @@ export class AppComponent {
     if ( date.split(".").reverse().join("-") < this._minDateForFiltr ){
       return false;
     }
-    // const tempDate = date.split(".").reverse().map(Number);
-    // const tempMinDate = this._minDateForFiltr.split("-").map(Number);
-    // const tempMaxDate = this._maxDateForFiltr.split("-").map(Number);
-    // if ((tempDate[0] > tempMinDate[0]) && (tempDate[0] < tempMaxDate[0])){
-    //   return true;
-    // } if (tempDate[0] === tempMinDate[0]){
-    //   if (tempDate[1] > tempMinDate[1]){
-    //     return true;
-    //   } if ((tempDate[1] === tempMinDate[1]) && (tempDate[2] >= tempMinDate[2])){
-    //     return true;
-    //   }
-    // } else if (tempDate[0] === tempMaxDate[0]){
-    //   if (tempDate[1] < tempMaxDate[1]){
-    //     return true;
-    //   } if ((tempDate[1] === tempMaxDate[1]) && (tempDate[2] <= tempMaxDate[2])){
-    //     return true;
-    //   }
-    // }
     return true;
   }
 
