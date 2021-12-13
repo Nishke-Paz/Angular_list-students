@@ -1,0 +1,64 @@
+<h1>Список студентов</h1>
+
+<div class="block-search">
+    <input #searchName type="text" placeholder="Поиск студента (напр. Иванов Иван)">
+    <button (click)="setSearchName(searchName.value)">Найти</button>
+</div>
+
+<div *ngIf="!hidePopUp" class="popup">
+    <div class="popup__content">
+        <h3>Вы точно хотите удалить запись?</h3>
+        <div class="popup__btns">
+            <button (click)="deleteStudent()">Да</button>
+            <button (click)="hidePopUp = true">Нет</button>
+        </div>
+    </div>
+</div>
+
+<div class="table">
+    <table>
+        <tr>
+            <th><button (click)="sortSName()">Фамилия</button></th>
+            <th><button (click)="sortName()">Имя</button></th>
+            <th><button (click)="sortPatronymic()">Отчество</button></th>
+            <th><button (click)="sortGrade()">Средний балл</button></th>
+            <th><button (click)="sortDate()">Дата Рождения</button></th>
+            <th>Удалить</th>
+        </tr>
+        <tr #trInfo [class.background-yellow]="comparisonOfNames(item)" 
+        [class.background-red]="isBadStudent(item) && highlightBadStudents"
+        *ngFor="let item of students; let i = index">
+            <ng-container *ngIf="gradeIsInRange(item.averageScore) && dateIsInRange(item.dateOfBirth) && item.isNecessary" >
+                <td>{{item.secondName}}</td>
+                <td>{{item.name}}</td>
+                <td>{{item.patronymic}}</td>
+                <td>{{item.averageScore}}</td>
+                <td>{{item.dateOfBirth}}</td>
+                <td id="remove-student"><button (click)="hidePopUp = false; studentForDelete = item">×</button></td>
+            </ng-container>
+        </tr>
+    </table>
+    <div>
+        <input type="checkbox" id="checkbox" checked [(ngModel)]="highlightBadStudents"/>
+        <label for="checkbox"> - подсвечивать плохих студентов</label>
+    </div>
+    <div>
+        <h3>Фильтры:</h3>
+        <div>
+            <p>по баллам</p>
+            <label for="min-grade">с </label>
+            <input #minGrade type="number" id="min-grade" value="0">
+            <label for="max-grade"> по </label>
+            <input #maxGrade type="number" id="max-grade" value="5">
+            <button (click)="setGradesForFiltr(minGrade.value, maxGrade.value)">Отфильтровать</button>
+        </div>
+        <div>
+            <p>по дате рождения</p>
+            <label for="min-date">с </label>
+            <input #minDate type="date" id="min-date">
+            <label for="max-date"> по </label>
+            <input #maxDate type="date" id="max-date">
+            <button (click)="setDatesForFiltr(minDate.value, maxDate.value)">Отфильтровать</button>
+        </div>
+    </div>
+</div>

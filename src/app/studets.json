@@ -1,0 +1,83 @@
+{
+    "student1": {
+        "name":"Максим",
+        "secondName": "Бурнаев",
+        "patronymic": "Анатольевич",
+        "dateOfBirth": "27.11.2000",
+        "averageScore": 4.95,
+        "isNecessary": true
+    },
+    "student2": {
+        "name":"Иван",
+        "secondName": "Кулагин",
+        "patronymic": "Сергеевич",
+        "dateOfBirth": "20.10.1999",
+        "averageScore": 4.3,
+        "isNecessary": true
+    },
+    "student3": {
+        "name":"Роман",
+        "secondName": "Царьков",
+        "patronymic": "Сергеевич",
+        "dateOfBirth": "17.11.2000",
+        "averageScore": 2.9,
+        "isNecessary": true
+    },
+    "student4": {
+        "name":"Михаил",
+        "secondName": "Костюнин",
+        "patronymic": "Александрович",
+        "dateOfBirth": "11.09.1998",
+        "averageScore": 5,
+        "isNecessary": true
+    },
+    "student5": {
+        "name":"Ангелина",
+        "secondName": "Фомичева",
+        "patronymic": "Николаевна",
+        "dateOfBirth": "14.04.2001",
+        "averageScore": 3.3,
+        "isNecessary": true
+    },
+    "student6": {
+        "name":"Алексей",
+        "secondName": "Коршунов",
+        "patronymic": "Владимирович",
+        "dateOfBirth": "16.12.2000",
+        "averageScore": 2.5,
+        "isNecessary": true
+    },
+    "student7": {
+        "name":"Алексей",
+        "secondName": "Стрельцов",
+        "patronymic": "Николаевич",
+        "dateOfBirth": "20.01.2002",
+        "averageScore": 4.1,
+        "isNecessary": true
+    },
+    "student8": {
+        "name":"Дмитрий",
+        "secondName": "Поряков",
+        "patronymic": "Александрович",
+        "dateOfBirth": "24.07.1999",
+        "averageScore": 3.7,
+        "isNecessary": true
+    },
+    "student9": {
+        "name":"Полина",
+        "secondName": "Горюнова",
+        "patronymic": "Дмитриевна",
+        "dateOfBirth": "07.05.1998",
+        "averageScore": 4.7,
+        "isNecessary": true
+    },
+    "student10": {
+        "name":"Даниил",
+        "secondName": "Морозов",
+        "patronymic": "Васильевич",
+        "dateOfBirth": "30.08.2000",
+        "averageScore": 2.5,
+        "isNecessary": true
+    }
+    
+}
