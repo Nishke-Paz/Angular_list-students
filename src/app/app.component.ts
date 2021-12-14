@@ -36,23 +36,36 @@ export class AppComponent {
     return this._students;
   }
 
-  get studentForDelete(): Student | null{
-    return this._studentForDelete;
+  set searchName(name: string){
+    this._searchName = name;
   }
 
   set studentForDelete(data: Student | null){
     this._studentForDelete = data;
   }
 
-  setSearchName(name: string): void{
-    this._searchName = name;
+  set minGradeForFiltr(num: number){
+    this._minGradeForFiltr = num;
+  }
+
+  set maxGradeForFiltr(num: number){
+    this._maxGradeForFiltr = num;
+  }
+
+  set minDateForFiltr(date: string){
+    this._minDateForFiltr = date;
+  }
+
+  set maxDateForFiltr(date: string){
+    this._maxDateForFiltr = date;
+  }
+
+  number(str: string): number{
+    return Number(str);
   }
 
   isBadStudent(student: Student): boolean{
-    if (Number(student.averageScore) < this._minPositiveGrade){
-      return true;
-    }
-    return false;
+    return student.averageScore < this._minPositiveGrade;
   }
 
   deleteStudent(): void{
@@ -60,6 +73,14 @@ export class AppComponent {
       this._studentForDelete.isNecessary = false;
     }
     this.hidePopUp = true;
+  }
+
+  resetFilters(): void{
+    this._searchName = "";
+    this.minGradeForFiltr = 0;
+    this._maxGradeForFiltr = 5;
+    this._minDateForFiltr = "0-0-0";
+    this._maxDateForFiltr = "3000-0-0";
   }
 
   sortName(): void{
@@ -142,15 +163,6 @@ export class AppComponent {
     return 0;
   }
 
-  setDatesForFiltr(minDate: string, maxDate: string): void{
-    if (minDate){
-      this._minDateForFiltr = minDate;
-    }
-    if (maxDate){
-      this._maxDateForFiltr = maxDate;
-    }
-  }
-
   dateIsInRange(date: string): boolean{
     if ( date.split(".").reverse().join("-") > this._maxDateForFiltr ){
       return false;
@@ -159,11 +171,6 @@ export class AppComponent {
       return false;
     }
     return true;
-  }
-
-  setGradesForFiltr(min: string, max: string): void{
-    this._maxGradeForFiltr = Number(max);
-    this._minGradeForFiltr = Number(min);
   }
 
   gradeIsInRange(grade: number): boolean{
@@ -185,6 +192,5 @@ export class AppComponent {
     }
     return true;
   }
-
 
 }
