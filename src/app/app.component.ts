@@ -1,7 +1,7 @@
 import { Component } from "@angular/core";
 import * as listStudents from "./studets.json";
 
-interface Student {
+export interface Student {
   name: string;
   secondName: string;
   patronymic: string;
@@ -31,6 +31,18 @@ export class AppComponent {
   private _sortTypeByDate: number = -1;
   public highlightBadStudents: boolean = true;
   public hidePopUp: boolean = true;
+  public resetStudent: boolean = false;
+
+  public studentForChange: Student = {
+    name: "",
+    secondName:  "",
+    patronymic:  "",
+    averageScore: 0,
+    dateOfBirth: "",
+    isNecessary: true
+  };
+
+  numberStudent = 0;
 
   get students(): [...object: Student[]]{
     return this._students;
@@ -58,6 +70,10 @@ export class AppComponent {
 
   set maxDateForFiltr(date: string){
     this._maxDateForFiltr = date;
+  }
+
+  changeList(data: Student[]): void{
+    this._students = data;
   }
 
   number(str: string): number{

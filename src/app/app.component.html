@@ -13,6 +13,7 @@
 <div class="table">
     <table>
         <tr class="table__filters">
+            <th rowspan="2"></th>
             <th colspan="3">
                 <div class="table__block-search">
                     <input #name type="text" placeholder="Поиск студента (напр. Иванов Иван)">
@@ -62,6 +63,7 @@
         [class.background-red]="isBadStudent(item) && highlightBadStudents"
         *ngFor="let item of students; let i = index">
             <ng-container *ngIf="gradeIsInRange(item.averageScore) && dateIsInRange(item.dateOfBirth) && item.isNecessary" >
+                <td><button (click)="studentForChange=item; resetStudent=true; numberStudent=i">✎</button></td>
                 <td>{{item.secondName}}</td>
                 <td>{{item.name}}</td>
                 <td>{{item.patronymic}}</td>
@@ -75,4 +77,6 @@
         <input type="checkbox" id="checkbox" checked [(ngModel)]="highlightBadStudents"/>
         <label for="checkbox"> - подсвечивать плохих студентов</label>
     </div>
+    <app-form [numberStudent]="numberStudent" [person]="studentForChange" [editing]="resetStudent" [students]="students" 
+    (feedbackEditing)="resetStudent=false" (addStudent)="changeList($event)"></app-form>
 </div>
