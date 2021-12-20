@@ -34,7 +34,7 @@
             </div>
             <div class="popup__entryField">
                 <label for="averageScore"><p>Средний балл:</p></label>
-                <input id="averageScore" formControlName="averageScore">
+                <input type="number" id="averageScore" formControlName="averageScore">
                 <div *ngIf="showErrorScore" class="errors">
                     <p>Введите средний балл (от 0 до 5)</p>
                 </div>
