@@ -30,12 +30,12 @@ export class EditingDirective implements DoCheck {
 
   @HostListener("mousemove")
   addClassSearch(): void{
-    this.renderer.setAttribute(this.el.nativeElement.firstElementChild, "class", "search");
+    this.renderer.setAttribute(this.el.nativeElement.firstElementChild, "class", "animationEdit");
   }
 
   @HostListener("mouseleave")
   removeClassSearch(): void{
-    this.renderer.removeClass(this.el.nativeElement.firstElementChild, "search");
+    this.renderer.removeClass(this.el.nativeElement.firstElementChild, "animationEdit");
   }
 
 }
