@@ -1,11 +1,12 @@
-import { Component, Input, Output, EventEmitter, OnChanges } from "@angular/core";
+import { Component, Input, Output, EventEmitter, OnChanges, ChangeDetectionStrategy, ChangeDetectorRef } from "@angular/core";
 import { FormControl, FormGroup, Validators, ValidatorFn, AbstractControl } from "@angular/forms";
-import { Student } from "../app.component";
+import { Student } from "../table/table.component";
 
 @Component({
   selector: "app-form",
   templateUrl: "./form.component.html",
-  styleUrls: ["./form.component.less"]
+  styleUrls: ["./form.component.less"],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class FormComponent implements OnChanges {
 
@@ -23,6 +24,9 @@ export class FormComponent implements OnChanges {
   showErrorDate = false;
   showErrorMaxDate = false;
   showErrorNameMatches = false;
+  config = {
+    showSuccessfulAddition: false
+  };
   showSuccessfulAddition = false;
   addition = false;
 
@@ -36,6 +40,8 @@ export class FormComponent implements OnChanges {
     dateOfBirth: "",
     isNecessary: true
   };
+
+  constructor(private cd: ChangeDetectorRef){}
 
   ngOnChanges(): void{
     if (this.editing){
@@ -55,6 +61,10 @@ export class FormComponent implements OnChanges {
     averageScore : new FormControl(null, [Validators.required, Validators.min(0), Validators.max(5)]),
     dateOfBirth: new FormControl(null, [Validators.required, this._dateValidator()])
   });
+
+  // get showSuccessfulAddition(): boolean{
+  //   return this.config.showSuccessfulAddition;
+  // }
 
   private _nameIscomplete(str: string): boolean{
     const formPerson: FormGroup = <FormGroup> this.formModel.controls["person"];
@@ -122,9 +132,16 @@ export class FormComponent implements OnChanges {
       if (this.addition){
         this.resetForm();
       }
+      // this.config = {
+      //   showSuccessfulAddition: true
+      // }
       this.showSuccessfulAddition = true;
       setTimeout(() => {
+        // this.config = {
+        //   showSuccessfulAddition: false
+        // }
         this.showSuccessfulAddition = false;
+        this.cd.markForCheck();
       }, 1500);
     } else {
       this._nameIscomplete("secondName") ? this.showErrorEnterSecondName = false : this.showErrorEnterSecondName = true;
