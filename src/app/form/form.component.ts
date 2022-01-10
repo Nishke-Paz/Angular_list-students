@@ -1,6 +1,8 @@
-import { Component, Input, Output, EventEmitter, OnChanges, ChangeDetectionStrategy, ChangeDetectorRef } from "@angular/core";
+import { Component, ChangeDetectionStrategy, ChangeDetectorRef } from "@angular/core";
 import { FormControl, FormGroup, Validators, ValidatorFn, AbstractControl } from "@angular/forms";
 import { Student } from "../table/table.component";
+import { DataServer } from "../services/dataServer";
+import { ActivatedRoute } from "@angular/router";
 
 @Component({
   selector: "app-form",
@@ -8,14 +10,13 @@ import { Student } from "../table/table.component";
   styleUrls: ["./form.component.less"],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class FormComponent implements OnChanges {
+export class FormComponent{
 
-  @Input() students: [...object: Student[]] = [];
+  students: Student[] = [];
+  studentForEditing: Student | null = null;
 
-  @Input() editing: boolean = false;
-  @Input() numberStudent: number = 0;
-  @Output() addStudent = new EventEmitter<Student[]>();
-  @Output() feedbackEditing = new EventEmitter();
+  editing: boolean = false;
+  addition = false;
 
   showErrorEnterName = false;
   showErrorEnterSecondName = false;
@@ -24,49 +25,42 @@ export class FormComponent implements OnChanges {
   showErrorDate = false;
   showErrorMaxDate = false;
   showErrorNameMatches = false;
-  config = {
-    showSuccessfulAddition: false
-  };
   showSuccessfulAddition = false;
-  addition = false;
 
-  studentForEditing: Student | null = null;
+  title: string = "";
 
-  @Input() person: Student = {
-    name: "",
-    secondName:  "",
-    patronymic:  "",
-    averageScore: 0,
-    dateOfBirth: "",
-    isNecessary: true
-  };
-
-  constructor(private cd: ChangeDetectorRef){}
-
-  ngOnChanges(): void{
-    if (this.editing){
-      this.formModel.controls["person"].setValue({ name: this.person.name, secondName:this.person.secondName, patronymic: this.person.patronymic });
-      this.formModel.controls["dateOfBirth"].setValue(this.person.dateOfBirth.split(".").reverse().join("-"));
-      this.formModel.controls["averageScore"].setValue(this.person.averageScore);
-      this.studentForEditing = this.students[this.numberStudent];
+  constructor(private _changeDetectorRef: ChangeDetectorRef, private _dataServer: DataServer, activeRoute: ActivatedRoute){
+    this.students = this._dataServer.getData();
+    if (activeRoute.snapshot.url[0].path === "edit"){
+      this.title = "Редактировать";
+      this.students.forEach((item) => {
+        if (item.id === Number(activeRoute.snapshot.queryParams["id"])){
+          this.studentForEditing = item;
+          this.formModel.controls["person"].setValue({ name: this.studentForEditing.name,
+            secondName:this.studentForEditing.secondName,
+            patronymic: this.studentForEditing.patronymic });
+          this.formModel.controls["dateOfBirth"].setValue(this.studentForEditing.dateOfBirth.split(".").reverse().join("-"));
+          this.formModel.controls["averageScore"].setValue(this.studentForEditing.averageScore);
+          this.editing = true;
+        }
+      });
+    } else {
+      this.title = "Добавить";
+      this.addition = true;
     }
-
   }
+
   formModel = new FormGroup({
     person: new FormGroup({
-      name: new FormControl(this.person.name, [Validators.required, Validators.minLength(2), Validators.pattern(/^[а-яА-ЯёЁ]+$/)]),
-      secondName: new FormControl(this.person.secondName, [Validators.required, Validators.minLength(2), Validators.pattern(/^[а-яА-ЯёЁ]+$/)]),
-      patronymic: new FormControl(this.person.patronymic, [Validators.required, Validators.minLength(2), Validators.pattern(/^[а-яА-ЯёЁ]+$/)])
+      name: new FormControl(null, [Validators.required, Validators.minLength(2), Validators.pattern(/^[а-яА-ЯёЁ]+$/)]),
+      secondName: new FormControl(null, [Validators.required, Validators.minLength(2), Validators.pattern(/^[а-яА-ЯёЁ]+$/)]),
+      patronymic: new FormControl(null, [Validators.required, Validators.minLength(2), Validators.pattern(/^[а-яА-ЯёЁ]+$/)])
     }, [this._nameValidator()]),
     averageScore : new FormControl(null, [Validators.required, Validators.min(0), Validators.max(5)]),
     dateOfBirth: new FormControl(null, [Validators.required, this._dateValidator()])
   });
 
-  // get showSuccessfulAddition(): boolean{
-  //   return this.config.showSuccessfulAddition;
-  // }
-
-  private _nameIscomplete(str: string): boolean{
+  private _nameIsComplete(str: string): boolean{
     const formPerson: FormGroup = <FormGroup> this.formModel.controls["person"];
     const inputName = formPerson.controls[str];
     if (inputName.errors && (inputName.errors["required"] || inputName.errors["minlength"] || inputName.errors["pattern"])){
@@ -97,11 +91,6 @@ export class FormComponent implements OnChanges {
     };
   }
 
-  resetErrors(): void{
-    this.showErrorDate = this.showErrorEnterName = this.showErrorEnterPatronymic =
-    this.showErrorEnterSecondName = this.showErrorScore = this.showErrorMaxDate = this.showErrorNameMatches = false;
-  }
-
   resetForm(): void{
     this.formModel.controls["person"].setValue({ name: "", secondName: "", patronymic: "" });
     this.formModel.controls["dateOfBirth"].setValue("");
@@ -122,31 +111,23 @@ export class FormComponent implements OnChanges {
           name: formValue.controls["name"].value,
           secondName: formValue.controls["secondName"].value,
           patronymic: formValue.controls["patronymic"].value,
+          id: this.students[this.students.length - 1].id + 1,
           averageScore: this.formModel.controls["averageScore"].value,
           dateOfBirth: this.formModel.controls["dateOfBirth"].value.split("-").reverse().join("."),
           isNecessary: true
         });
-      }
-      this.addStudent.emit(this.students);
-      this.resetErrors();
-      if (this.addition){
         this.resetForm();
       }
-      // this.config = {
-      //   showSuccessfulAddition: true
-      // }
+      this._dataServer.setData(this.students);
       this.showSuccessfulAddition = true;
       setTimeout(() => {
-        // this.config = {
-        //   showSuccessfulAddition: false
-        // }
         this.showSuccessfulAddition = false;
-        this.cd.markForCheck();
+        this._changeDetectorRef.markForCheck();
       }, 1500);
     } else {
-      this._nameIscomplete("secondName") ? this.showErrorEnterSecondName = false : this.showErrorEnterSecondName = true;
-      this._nameIscomplete("name") ? this.showErrorEnterName = false : this.showErrorEnterName = true;
-      this._nameIscomplete("patronymic") ? this.showErrorEnterPatronymic = false : this.showErrorEnterPatronymic = true;
+      this._nameIsComplete("secondName") ? this.showErrorEnterSecondName = false : this.showErrorEnterSecondName = true;
+      this._nameIsComplete("name") ? this.showErrorEnterName = false : this.showErrorEnterName = true;
+      this._nameIsComplete("patronymic") ? this.showErrorEnterPatronymic = false : this.showErrorEnterPatronymic = true;
       if (this.formModel.controls["averageScore"].errors && (this.formModel.controls["averageScore"].errors["required"] ||
           this.formModel.controls["averageScore"].errors["max"] ||
           this.formModel.controls["averageScore"].errors["min"])){

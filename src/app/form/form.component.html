@@ -1,58 +1,55 @@
-
-<button (click)="addition=true">Добавить студента</button>
-
-<div *ngIf="editing || addition" class="popup">
-    <fieldset *ngIf="editing || addition">
-        <legend><h3 *ngIf="addition">Добавить</h3><h3 *ngIf="editing">Редактировать</h3></legend>
-        <span (click)="resetForm(); editing=false; addition=false; resetErrors(); feedbackEditing.emit()" class="popup__close">закрыть ×</span>
-        <form novalidate [formGroup]="formModel" (ngSubmit)="_onSubmit()">
-            <div formGroupName="person">
-                <div class="popup__entryField">
-                    <label for="secondName"><p>Фамилия:</p></label>
-                    <input id="secondName" formControlName="secondName">
-                    <div *ngIf="showErrorEnterSecondName" class="errors">
-                        <p>Введите фамилию (минимум 2 символа, только кириллица)</p>
-                    </div>
-                </div>
-                <div class="popup__entryField">
-                    <label for="name"><p>Имя:</p></label>
-                    <input id="name" formControlName="name">
-                    <div *ngIf="showErrorEnterName" class="errors">
-                        <p>Введите имя (минимум 2 символа, только кириллица)</p>
-                    </div>
-                    <div *ngIf="showErrorNameMatches" class="errors">
-                        <p>Имя не должно совпадать ни с фамилией, ни с отчеством</p>
-                    </div>
-                </div>
-                <div class="popup__entryField">
-                    <label for="patronymic"><p>Отчество:</p></label>
-                    <input id="patronymic" formControlName="patronymic">
-                    <div *ngIf="showErrorEnterPatronymic" class="errors">
-                        <p>Введите отчество (минимум 2 символа, только кириллица)</p>
-                    </div>
-                </div>
-            </div>
-            <div class="popup__entryField">
-                <label for="averageScore"><p>Средний балл:</p></label>
-                <input type="number" id="averageScore" formControlName="averageScore">
-                <div *ngIf="showErrorScore" class="errors">
-                    <p>Введите средний балл (от 0 до 5)</p>
-                </div>
-            </div>
-            <div class="popup__entryField">
-                <label for="dateOfBirth"><p>Дата рождения:</p></label>
-                <input type="date" id="dateOfBirth" formControlName="dateOfBirth">
-                <div *ngIf="showErrorDate" class="errors">
-                    <p>Введите дату рождения</p>
-                </div>
-                <div *ngIf="showErrorMaxDate" class="errors">
-                    <p>Студент должен быть старше 10 лет</p>
-                </div>
-            </div>
-            <button id="submit" type="submit"><span *ngIf="addition">Добавить</span><span *ngIf="editing">Редактировать</span></button>
-        </form>
-        <div *ngIf="showSuccessfulAddition" class="popup__info">
-            <p *ngIf="addition">Запись добавлена ✅</p><p *ngIf="editing">Запись отредактирована ✅</p>
+<div class="popup">
+  <fieldset >
+    <legend><h3>{{title}}</h3></legend>
+    <span routerLink="../" class="popup__close">закрыть ×</span>
+    <form novalidate [formGroup]="formModel" (ngSubmit)="_onSubmit()">
+      <div formGroupName="person">
+        <div class="popup__entryField">
+          <label for="secondName"><p>Фамилия:</p></label>
+          <input id="secondName" formControlName="secondName">
+          <div *ngIf="showErrorEnterSecondName" class="errors">
+            <p>Введите фамилию (минимум 2 символа, только кириллица)</p>
+          </div>
         </div>
-    </fieldset>
+        <div class="popup__entryField">
+          <label for="name"><p>Имя:</p></label>
+          <input id="name" formControlName="name">
+          <div *ngIf="showErrorEnterName" class="errors">
+            <p>Введите имя (минимум 2 символа, только кириллица)</p>
+          </div>
+          <div *ngIf="showErrorNameMatches" class="errors">
+            <p>Имя не должно совпадать ни с фамилией, ни с отчеством</p>
+          </div>
+        </div>
+        <div class="popup__entryField">
+          <label for="patronymic"><p>Отчество:</p></label>
+          <input id="patronymic" formControlName="patronymic">
+          <div *ngIf="showErrorEnterPatronymic" class="errors">
+            <p>Введите отчество (минимум 2 символа, только кириллица)</p>
+          </div>
+        </div>
+      </div>
+      <div class="popup__entryField">
+        <label for="averageScore"><p>Средний балл:</p></label>
+        <input type="number" id="averageScore" formControlName="averageScore">
+        <div *ngIf="showErrorScore" class="errors">
+          <p>Введите средний балл (от 0 до 5)</p>
+        </div>
+      </div>
+      <div class="popup__entryField">
+        <label for="dateOfBirth"><p>Дата рождения:</p></label>
+        <input type="date" id="dateOfBirth" formControlName="dateOfBirth">
+        <div *ngIf="showErrorDate" class="errors">
+          <p>Введите дату рождения</p>
+        </div>
+        <div *ngIf="showErrorMaxDate" class="errors">
+          <p>Студент должен быть старше 10 лет</p>
+        </div>
+      </div>
+      <button id="submit" type="submit"><span>{{title}}</span></button>
+    </form>
+    <div *ngIf="showSuccessfulAddition" class="popup__info">
+      <p *ngIf="addition">Запись добавлена ✅</p><p *ngIf="editing">Запись отредактирована ✅</p>
+    </div>
+  </fieldset>
 </div>

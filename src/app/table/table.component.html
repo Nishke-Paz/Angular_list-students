@@ -24,11 +24,11 @@
                 <div  class="table__filter">
                     <div>
                         <label for="min-grade"> с </label>
-                        <input (change)="minGradeForFiltr = number(minGrade.value)" #minGrade type="number" id="min-grade" value="0" min="0" max="5">
+                        <input (change)="minGradeForFilter = number(minGrade.value)" #minGrade type="number" id="min-grade" value="0" min="0" max="5">
                     </div>
                     <div>
                         <label for="max-grade"> по </label>
-                        <input (change)="maxGradeForFiltr = number(maxGrade.value)" #maxGrade type="number" id="max-grade" value="5" min="0" max="5">
+                        <input (change)="maxGradeForFilter = number(maxGrade.value)" #maxGrade type="number" id="max-grade" value="5" min="0" max="5">
                     </div>
                 </div>
             </th>
@@ -36,11 +36,11 @@
                 <div class="table__filter">
                     <div>
                         <label for="min-date"> с </label>
-                        <input (change)="minDateForFiltr = minDate.value" #minDate type="date" id="min-date">
+                        <input (change)="minDateForFilter = minDate.value" #minDate type="date" id="min-date">
                     </div>
                     <div>
                         <label for="max-date"> по </label>
-                        <input (change)="maxDateForFiltr = maxDate.value" #maxDate type="date" id="max-date">
+                        <input (change)="maxDateForFilter = maxDate.value" #maxDate type="date" id="max-date">
                     </div>
                 </div>
             </th>
@@ -60,11 +60,11 @@
             <th><button (click)="sortDate()">Дата Рождения</button></th>
             <th></th>
         </tr>
-        <tr #trInfo [class.background-yellow]="comparisonOfNames(item)" 
+        <tr #trInfo [class.background-yellow]="comparisonOfNames(item)"
         [class.background-red]="isBadStudent(item) && highlightBadStudents"
         *ngFor="let item of students; let i = index">
             <ng-container *ngIf="gradeIsInRange(item.averageScore) && dateIsInRange(item.dateOfBirth) && item.isNecessary" >
-                <td><button [btnEdit]="resetStudent" (click)="studentForChange=item; resetStudent=true; numberStudent=i"><p>✎</p></button></td>
+                <td><button [btnEdit]="item.averageScore" (click)="setStudentService()" [routerLink]="['/edit']" [queryParams]="{id: item.id}"><p>✎</p></button></td>
                 <td>{{item.secondName | name}}</td>
                 <td>{{item.name | name}}</td>
                 <td>{{item.patronymic | name}}</td>
@@ -78,6 +78,7 @@
         <input type="checkbox" id="checkbox" checked [(ngModel)]="highlightBadStudents"/>
         <label for="checkbox"> - подсвечивать плохих студентов</label>
     </div>
-    <app-form [numberStudent]="numberStudent" [person]="studentForChange" [editing]="resetStudent" [students]="students" 
-    (feedbackEditing)="resetStudent=false" (addStudent)="changeList($event)"></app-form>
+  <router-outlet></router-outlet>
 </div>
+<button class="btn-add" routerLink="/add">Добавить студента</button>
+

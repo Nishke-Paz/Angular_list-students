@@ -1,41 +1,43 @@
-import { Directive, Renderer2, ElementRef, HostListener, Input, DoCheck } from "@angular/core";
+import { Directive, Renderer2, ElementRef, HostListener, DoCheck, Input } from "@angular/core";
+import { ActivatedRoute } from "@angular/router";
 
 @Directive({
   selector: "[btnEdit]"
 })
 export class EditingDirective implements DoCheck {
-
-  @Input("btnEdit")
-  isReset: boolean = false;
-
   private _isClick: boolean = false;
 
-  constructor(private renderer: Renderer2, private el: ElementRef) {
+  @Input("btnEdit")
+  score: number = 0;
+
+  constructor(private _renderer: Renderer2, private _el: ElementRef, private _activatedRoute: ActivatedRoute) {
   }
 
   ngDoCheck(): void{
-    if (!this.isReset && this._isClick){
+    if ((this._activatedRoute.snapshot.queryParams["id"] === undefined) && this._isClick){
       this._isClick = false;
       setTimeout(() => {
-        this.renderer.removeStyle(this.el.nativeElement.parentElement.parentElement, "backgroundColor");
+        this._renderer.removeStyle(this._el.nativeElement.parentElement.parentElement, "backgroundColor");
       }, 800);
     }
   }
 
   @HostListener("click")
   changeStyle(): void{
-    this.renderer.setStyle(this.el.nativeElement.parentElement.parentElement, "backgroundColor", "#D9FFB4");
-    this._isClick = true;
+    if (this.score < 5){
+      this._renderer.setStyle(this._el.nativeElement.parentElement.parentElement, "backgroundColor", "#D9FFB4");
+      this._isClick = true;
+    }
   }
 
   @HostListener("mousemove")
   addClassSearch(): void{
-    this.renderer.setAttribute(this.el.nativeElement.firstElementChild, "class", "animationEdit");
+    this._renderer.setAttribute(this._el.nativeElement.firstElementChild, "class", "animationEdit");
   }
 
   @HostListener("mouseleave")
   removeClassSearch(): void{
-    this.renderer.removeClass(this.el.nativeElement.firstElementChild, "animationEdit");
+    this._renderer.removeClass(this._el.nativeElement.firstElementChild, "animationEdit");
   }
 
 }

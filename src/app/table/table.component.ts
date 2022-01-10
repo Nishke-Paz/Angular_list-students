@@ -1,5 +1,9 @@
-import { Component, ChangeDetectionStrategy } from "@angular/core";
-import * as listStudents from "../studets.json";
+import { Component, ChangeDetectionStrategy, OnInit } from "@angular/core";
+import { DataClientService } from "../services/data-client.service";
+import { DataServerService } from "../services/data-server.service";
+import { ActivatedRoute } from "@angular/router";
+import { DataServer } from "../services/dataServer";
+import { HttpClient } from "@angular/common/http";
 
 export interface Student {
   name: string;
@@ -8,22 +12,31 @@ export interface Student {
   dateOfBirth: string;
   averageScore: number;
   isNecessary: boolean;
+  id: number;
 }
 
 @Component({
   selector: "app-table",
   templateUrl: "./table.component.html",
   styleUrls: ["./table.component.less"],
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  providers: [ { provide: DataServer,
+  useFactory: (activatedRoute: ActivatedRoute, httpClient: HttpClient): DataServer => {
+    if (activatedRoute.snapshot.queryParams["server"] === "false"){
+      return new DataClientService();
+    }
+    return new DataServerService(httpClient);
+  }, deps: [ActivatedRoute, HttpClient] }]
 })
-export class TableComponent {
-  private _students: [...object: Student[]] = Object.values(listStudents).slice(0, Object.values(listStudents).length - 1);
+export class TableComponent implements OnInit{
+  private _students: Student[] = [];
+
   private _searchName: string = "";
   private _minPositiveGrade: number = 3;
-  private _minGradeForFiltr: number = 0;
-  private _maxGradeForFiltr: number = 5;
-  private _minDateForFiltr: string = "0-0-0";
-  private _maxDateForFiltr: string = "3000-0-0";
+  private _minGradeForFilter: number = 0;
+  private _maxGradeForFilter: number = 5;
+  private _minDateForFilter: string = "0-0-0";
+  private _maxDateForFilter: string = "3000-0-0";
   private _studentForDelete: Student | null = null;
   private _sortTypeByName: number = -1;
   private _sortTypeBySName: number = -1;
@@ -34,18 +47,21 @@ export class TableComponent {
   public hidePopUp: boolean = true;
   public resetStudent: boolean = false;
 
-  public studentForChange: Student = {
-    name: "",
-    secondName:  "",
-    patronymic:  "",
-    averageScore: 0,
-    dateOfBirth: "",
-    isNecessary: true
-  };
+  constructor(private _dataServer: DataServer, private _routes: ActivatedRoute, private _dataClientService: DataClientService) {
+  }
 
-  numberStudent = 0;
+  ngOnInit(): void {
+    if (this._routes.snapshot.queryParams["server"] === "false"){
+      this._students = this._dataServer.getData();
+    } else {
+      this._routes.data.subscribe((data) => {
+        this._dataServer.setData(Object.values(data["data"]));
+        this._students = this._dataServer.getData();
+      });
+    }
+  }
 
-  get students(): [...object: Student[]]{
+  get students(): Student[]{
     return this._students;
   }
 
@@ -57,20 +73,20 @@ export class TableComponent {
     this._studentForDelete = data;
   }
 
-  set minGradeForFiltr(num: number){
-    this._minGradeForFiltr = num;
+  set minGradeForFilter(num: number){
+    this._minGradeForFilter = num;
   }
 
-  set maxGradeForFiltr(num: number){
-    this._maxGradeForFiltr = num;
+  set maxGradeForFilter(num: number){
+    this._maxGradeForFilter = num;
   }
 
-  set minDateForFiltr(date: string){
-    this._minDateForFiltr = date;
+  set minDateForFilter(date: string){
+    this._minDateForFilter = date;
   }
 
-  set maxDateForFiltr(date: string){
-    this._maxDateForFiltr = date;
+  set maxDateForFilter(date: string){
+    this._maxDateForFilter = date;
   }
 
   changeList(data: Student[]): void{
@@ -79,6 +95,10 @@ export class TableComponent {
 
   number(str: string): number{
     return Number(str);
+  }
+
+  setStudentService(): void{
+    this._dataClientService.setData(this._students);
   }
 
   isBadStudent(student: Student): boolean{
@@ -93,12 +113,11 @@ export class TableComponent {
   }
 
   resetFilters(): void{
-    console.log(this);
     this._searchName = "";
-    this.minGradeForFiltr = 0;
-    this._maxGradeForFiltr = 5;
-    this._minDateForFiltr = "0-0-0";
-    this._maxDateForFiltr = "3000-0-0";
+    this.minGradeForFilter = 0;
+    this._maxGradeForFilter = 5;
+    this._minDateForFilter = "0-0-0";
+    this._maxDateForFilter = "3000-0-0";
   }
 
   sortName(): void{
@@ -182,17 +201,17 @@ export class TableComponent {
   }
 
   dateIsInRange(date: string): boolean{
-    if ( date.split(".").reverse().join("-") > this._maxDateForFiltr ){
+    if ( date.split(".").reverse().join("-") > this._maxDateForFilter ){
       return false;
     }
-    if ( date.split(".").reverse().join("-") < this._minDateForFiltr ){
+    if ( date.split(".").reverse().join("-") < this._minDateForFilter ){
       return false;
     }
     return true;
   }
 
   gradeIsInRange(grade: number): boolean{
-    if ((grade >= this._minGradeForFiltr) && (grade <= this._maxGradeForFiltr)){
+    if ((grade >= this._minGradeForFilter) && (grade <= this._maxGradeForFilter)){
       return true;
     }
     return false;
@@ -210,5 +229,4 @@ export class TableComponent {
     }
     return true;
   }
-
 }

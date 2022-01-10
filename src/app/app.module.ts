@@ -1,7 +1,8 @@
 import { NgModule } from "@angular/core";
-import { TableModule } from "./table.module";
 
+import { TableModule } from "./table.module";
 import { AppComponent } from "./app.component";
+import { AppRoutingModule } from "./app-routing/app-routing.module";
 
 
 @NgModule({
@@ -9,7 +10,7 @@ import { AppComponent } from "./app.component";
     AppComponent,
   ],
   imports: [
-    TableModule,
+    AppRoutingModule, TableModule,
   ],
   providers: [],
   bootstrap: [AppComponent]
