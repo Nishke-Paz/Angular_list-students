@@ -3,7 +3,7 @@
     "target": "http://localhost:3000/",
     "secure": false
   },
-  "/search": {
+  "/sendData": {
     "target": "http://localhost:3000/",
     "secure": false
   }

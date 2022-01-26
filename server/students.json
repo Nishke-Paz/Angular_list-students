@@ -1,0 +1,92 @@
+[
+  {
+    "name":"Максим",
+    "secondName": "Бурнаев",
+    "patronymic": "Анатольевич",
+    "dateOfBirth": "27.11.2000",
+    "averageScore": 4.95,
+    "isNecessary": true,
+    "id": 1
+  },
+  {
+    "name":"Иван",
+    "secondName": "Кулагин",
+    "patronymic": "Сергеевич",
+    "dateOfBirth": "20.10.1999",
+    "averageScore": 4.3,
+    "isNecessary": true,
+    "id": 2
+  },
+  {
+    "name":"Роман",
+    "secondName": "Царьков",
+    "patronymic": "Сергеевич",
+    "dateOfBirth": "17.11.2000",
+    "averageScore": 2.9,
+    "isNecessary": true,
+    "id": 3
+  },
+  {
+    "name":"Михаил",
+    "secondName": "Костюнин",
+    "patronymic": "Александрович",
+    "dateOfBirth": "11.09.1998",
+    "averageScore": 5,
+    "isNecessary": true,
+    "id": 4
+  },
+  {
+    "name":"Ангелина",
+    "secondName": "Фомичева",
+    "patronymic": "Николаевна",
+    "dateOfBirth": "14.04.2001",
+    "averageScore": 3.3,
+    "isNecessary": true,
+    "id": 5
+  },
+  {
+    "name":"Алексей",
+    "secondName": "Коршунов",
+    "patronymic": "Владимирович",
+    "dateOfBirth": "16.12.2000",
+    "averageScore": 2.5,
+    "isNecessary": true,
+    "id": 6
+  },
+  {
+    "name":"Алексей",
+    "secondName": "Стрельцов",
+    "patronymic": "Николаевич",
+    "dateOfBirth": "20.01.2002",
+    "averageScore": 4.1,
+    "isNecessary": true,
+    "id": 7
+  },
+  {
+    "name":"Дмитрий",
+    "secondName": "Поряков",
+    "patronymic": "Александрович",
+    "dateOfBirth": "24.07.1999",
+    "averageScore": 3.7,
+    "isNecessary": true,
+    "id": 8
+  },
+  {
+    "name":"Полина",
+    "secondName": "Горюнова",
+    "patronymic": "Дмитриевна",
+    "dateOfBirth": "07.05.1998",
+    "averageScore": 4.7,
+    "isNecessary": true,
+    "id": 9
+  },
+  {
+    "name":"Даниил",
+    "secondName": "Морозов",
+    "patronymic": "Васильевич",
+    "dateOfBirth": "30.08.2000",
+    "averageScore": 2.5,
+    "isNecessary": true,
+    "id": 10
+  }
+]

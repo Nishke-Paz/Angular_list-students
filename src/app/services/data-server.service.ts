@@ -2,25 +2,42 @@ import { Injectable } from "@angular/core";
 import { Student } from "../table/table.component";
 import { HttpClient } from "@angular/common/http";
 import { Observable } from "rxjs";
-import { DataServer } from "./dataServer";
+import { Store } from "@ngrx/store";
+import { studentSelector } from "../state/selectors/student.selector";
+import { addStudent } from "../state/actions/students.actions";
 
 @Injectable({
   providedIn: "root"
 })
-export class DataServerService implements DataServer{
+export class DataServerService{
 
-  private _students: Student[] = [];
+  constructor(
+    private _httpClient: HttpClient,
+    private store: Store) {
 
-  constructor(private _httpClient: HttpClient) {
+    this._httpClient.get("/api").subscribe((students: any) => {
+      for (const item of students){
+        this.store.dispatch(addStudent({
+          student: {
+            name: item.name,
+            secondName: item.secondName,
+            patronymic: item.patronymic,
+            dateOfBirth: item.dateOfBirth,
+            averageScore: item.averageScore,
+            isNecessary: true,
+            id: item.id
+          }
+        }));
+      }
+    });
   }
-
-  loadData(): Observable<unknown>{
-    return this._httpClient.get("/api");
+  getData(): Observable<Student[]>{
+    return this.store.select(studentSelector);
   }
-  setData(data: Student[]): void{
-    this._students = data;
-  }
-  getData(): Student[]{
-    return this._students;
+  sendData(data: Student): void{
+    this._httpClient.post("/sendData", data).subscribe();
+    this.store.dispatch(addStudent({
+      student: data
+    }));
   }
 }

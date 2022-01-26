@@ -1,9 +1,16 @@
 import { Component, ChangeDetectionStrategy, OnInit } from "@angular/core";
-import { DataClientService } from "../services/data-client.service";
 import { DataServerService } from "../services/data-server.service";
 import { ActivatedRoute } from "@angular/router";
-import { DataServer } from "../services/dataServer";
-import { HttpClient } from "@angular/common/http";
+import { Observable } from "rxjs";
+import { Store } from "@ngrx/store";
+import {
+  removeStudent,
+  sortByDateStudent,
+  sortByGradeStudent,
+  sortByNameStudent,
+  sortByPatronymicStudent,
+  sortBySecondNameStudent,
+} from "../state/actions/students.actions";
 
 export interface Student {
   name: string;
@@ -20,16 +27,10 @@ export interface Student {
   templateUrl: "./table.component.html",
   styleUrls: ["./table.component.less"],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  providers: [ { provide: DataServer,
-  useFactory: (activatedRoute: ActivatedRoute, httpClient: HttpClient): DataServer => {
-    if (activatedRoute.snapshot.queryParams["server"] === "false"){
-      return new DataClientService();
-    }
-    return new DataServerService(httpClient);
-  }, deps: [ActivatedRoute, HttpClient] }]
 })
 export class TableComponent implements OnInit{
-  private _students: Student[] = [];
+
+  public _students$?: Observable<Student[]>;
 
   private _searchName: string = "";
   private _minPositiveGrade: number = 3;
@@ -45,24 +46,14 @@ export class TableComponent implements OnInit{
   private _sortTypeByDate: number = -1;
   public highlightBadStudents: boolean = true;
   public hidePopUp: boolean = true;
-  public resetStudent: boolean = false;
 
-  constructor(private _dataServer: DataServer, private _routes: ActivatedRoute, private _dataClientService: DataClientService) {
+  constructor(private _routes: ActivatedRoute,
+              private _dataServerService: DataServerService,
+              private _store: Store) {
   }
 
   ngOnInit(): void {
-    if (this._routes.snapshot.queryParams["server"] === "false"){
-      this._students = this._dataServer.getData();
-    } else {
-      this._routes.data.subscribe((data) => {
-        this._dataServer.setData(Object.values(data["data"]));
-        this._students = this._dataServer.getData();
-      });
-    }
-  }
-
-  get students(): Student[]{
-    return this._students;
+    this._students$ = this._dataServerService.getData();
   }
 
   set searchName(name: string){
@@ -89,16 +80,8 @@ export class TableComponent implements OnInit{
     this._maxDateForFilter = date;
   }
 
-  changeList(data: Student[]): void{
-    this._students = data;
-  }
-
   number(str: string): number{
     return Number(str);
-  }
-
-  setStudentService(): void{
-    this._dataClientService.setData(this._students);
   }
 
   isBadStudent(student: Student): boolean{
@@ -106,8 +89,10 @@ export class TableComponent implements OnInit{
   }
 
   deleteStudent(): void{
-    if (this._studentForDelete){
-      this._studentForDelete.isNecessary = false;
+    if (this._studentForDelete !== null){
+      this._store.dispatch(removeStudent({
+        id: this._studentForDelete.id
+      }));
     }
     this.hidePopUp = true;
   }
@@ -121,83 +106,38 @@ export class TableComponent implements OnInit{
   }
 
   sortName(): void{
-    const tempCompareName = this.compareName.bind(this._sortTypeByName);
-    this.students.sort(tempCompareName);
+    this._store.dispatch(sortByNameStudent({
+      typeSort: this._sortTypeByName
+    }));
     this._sortTypeByName *= -1;
   }
 
-  compareName(a: Student, b: Student): number{
-    if ( a.name < b.name ){
-      return Number(this);
-    }
-    if ( a.name > b.name ){
-      return -Number(this);
-    }
-    return 0;
-  }
-
   sortSName(): void{
-    const tempCompareSName = this.compareSName.bind(this._sortTypeBySName);
-    this.students.sort(tempCompareSName);
+    this._store.dispatch(sortBySecondNameStudent({
+      typeSort: this._sortTypeBySName
+    }));
     this._sortTypeBySName *= -1;
   }
 
-  compareSName(a: Student, b: Student): number{
-    if ( a.secondName < b.secondName ){
-      return Number(this);
-    }
-    if ( a.secondName > b.secondName ){
-      return -Number(this);
-    }
-    return 0;
-  }
-
   sortPatronymic(): void{
-    const tempComparePatronymic = this.comparePatronymic.bind(this._sortTypeByPatronymic);
-    this.students.sort(tempComparePatronymic);
+    this._store.dispatch(sortByPatronymicStudent({
+      typeSort: this._sortTypeByPatronymic
+    }));
     this._sortTypeByPatronymic *= -1;
   }
 
-  comparePatronymic(a: Student, b: Student): number{
-    if ( a.patronymic < b.patronymic ){
-      return Number(this);
-    }
-    if ( a.patronymic > b.patronymic ){
-      return -Number(this);
-    }
-    return 0;
-  }
-
   sortGrade(): void{
-    const tempCompareGrade = this.compareGrade.bind(this._sortTypeByGrade);
-    this.students.sort(tempCompareGrade);
+    this._store.dispatch(sortByGradeStudent({
+      typeSort: this._sortTypeByGrade
+    }));
     this._sortTypeByGrade *= -1;
   }
 
-  compareGrade(a: Student, b: Student): number{
-    if ( a.averageScore < b.averageScore ){
-      return Number(this);
-    }
-    if ( a.averageScore > b.averageScore ){
-      return -Number(this);
-    }
-    return 0;
-  }
-
   sortDate(): void{
-    const tempCompareGrade = this.compareDate.bind(this._sortTypeByDate);
-    this.students.sort(tempCompareGrade);
+    this._store.dispatch(sortByDateStudent({
+      typeSort: this._sortTypeByDate
+    }));
     this._sortTypeByDate *= -1;
-  }
-
-  compareDate(a: Student, b: Student): number{
-    if ( a.dateOfBirth.split(".").reverse().join(".") < b.dateOfBirth.split(".").reverse().join(".") ){
-      return Number(this);
-    }
-    if ( a.dateOfBirth.split(".").reverse().join(".") > b.dateOfBirth.split(".").reverse().join(".") ){
-      return -Number(this);
-    }
-    return 0;
   }
 
   dateIsInRange(date: string): boolean{

@@ -1,8 +1,11 @@
 import { Component, ChangeDetectionStrategy, ChangeDetectorRef } from "@angular/core";
 import { FormControl, FormGroup, Validators, ValidatorFn, AbstractControl } from "@angular/forms";
 import { Student } from "../table/table.component";
-import { DataServer } from "../services/dataServer";
 import { ActivatedRoute } from "@angular/router";
+import { DataServerService } from "../services/data-server.service";
+import { Observable } from "rxjs";
+import { Store } from "@ngrx/store";
+import { editStudent, sendStudent} from "../state/actions/students.actions";
 
 @Component({
   selector: "app-form",
@@ -12,8 +15,9 @@ import { ActivatedRoute } from "@angular/router";
 })
 export class FormComponent{
 
-  students: Student[] = [];
+  students$?: Observable<Student[]>;
   studentForEditing: Student | null = null;
+  studentForEditingId?: number;
 
   editing: boolean = false;
   addition = false;
@@ -29,20 +33,24 @@ export class FormComponent{
 
   title: string = "";
 
-  constructor(private _changeDetectorRef: ChangeDetectorRef, private _dataServer: DataServer, activeRoute: ActivatedRoute){
-    this.students = this._dataServer.getData();
+  constructor(private _changeDetectorRef: ChangeDetectorRef,
+              private _dataServer: DataServerService,
+              private _store: Store,
+              private activeRoute: ActivatedRoute){
     if (activeRoute.snapshot.url[0].path === "edit"){
       this.title = "Редактировать";
-      this.students.forEach((item) => {
-        if (item.id === Number(activeRoute.snapshot.queryParams["id"])){
-          this.studentForEditing = item;
-          this.formModel.controls["person"].setValue({ name: this.studentForEditing.name,
-            secondName:this.studentForEditing.secondName,
-            patronymic: this.studentForEditing.patronymic });
-          this.formModel.controls["dateOfBirth"].setValue(this.studentForEditing.dateOfBirth.split(".").reverse().join("-"));
-          this.formModel.controls["averageScore"].setValue(this.studentForEditing.averageScore);
-          this.editing = true;
-        }
+      this._dataServer.getData().subscribe((data) => {
+        data.forEach((item) => {
+            if (item.id === Number(activeRoute.snapshot.queryParams["id"])){
+              this.studentForEditing = item;
+              this.formModel.controls["person"].setValue({ name: this.studentForEditing.name,
+                secondName:this.studentForEditing.secondName,
+                patronymic: this.studentForEditing.patronymic });
+              this.formModel.controls["dateOfBirth"].setValue(this.studentForEditing.dateOfBirth.split(".").reverse().join("-"));
+              this.formModel.controls["averageScore"].setValue(this.studentForEditing.averageScore);
+              this.editing = true;
+            }
+          });
       });
     } else {
       this.title = "Добавить";
@@ -101,24 +109,31 @@ export class FormComponent{
     if (this.formModel.valid){
       const formValue: FormGroup = <FormGroup> this.formModel.controls["person"];
       if (this.editing && this.studentForEditing){
-        this.studentForEditing.name = formValue.controls["name"].value;
-        this.studentForEditing.secondName = formValue.controls["secondName"].value;
-        this.studentForEditing.patronymic = formValue.controls["patronymic"].value;
-        this.studentForEditing.averageScore = this.formModel.controls["averageScore"].value;
-        this.studentForEditing.dateOfBirth = this.formModel.controls["dateOfBirth"].value.split("-").reverse().join(".");
+        this._store.dispatch(editStudent({
+          student: {
+            name: formValue.controls["name"].value,
+            secondName: formValue.controls["secondName"].value,
+            patronymic: formValue.controls["patronymic"].value,
+            averageScore: this.formModel.controls["averageScore"].value,
+            dateOfBirth: this.formModel.controls["dateOfBirth"].value.split("-").reverse().join("."),
+            id: Number(this.activeRoute.snapshot.queryParams["id"]),
+            isNecessary: true
+          }
+        }));
       } else {
-        this.students?.push({
-          name: formValue.controls["name"].value,
-          secondName: formValue.controls["secondName"].value,
-          patronymic: formValue.controls["patronymic"].value,
-          id: this.students[this.students.length - 1].id + 1,
-          averageScore: this.formModel.controls["averageScore"].value,
-          dateOfBirth: this.formModel.controls["dateOfBirth"].value.split("-").reverse().join("."),
-          isNecessary: true
-        });
+        this._store.dispatch(sendStudent({
+          student: {
+            name: formValue.controls["name"].value,
+            secondName: formValue.controls["secondName"].value,
+            patronymic: formValue.controls["patronymic"].value,
+            id: new Date().getFullYear() + new Date().getMonth() + new Date().getDay() + new Date().getHours() + new Date().getMinutes() + new Date().getSeconds(),
+            averageScore: this.formModel.controls["averageScore"].value,
+            dateOfBirth: this.formModel.controls["dateOfBirth"].value.split("-").reverse().join("."),
+            isNecessary: true
+          }
+        }));
         this.resetForm();
       }
-      this._dataServer.setData(this.students);
       this.showSuccessfulAddition = true;
       setTimeout(() => {
         this.showSuccessfulAddition = false;

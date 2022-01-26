@@ -1,29 +1,26 @@
 import { Injectable } from "@angular/core";
 import { ActivatedRouteSnapshot, CanActivate, RouterStateSnapshot } from "@angular/router";
-import { Student } from "./table/table.component";
-import { DataClientService } from "./services/data-client.service";
+import { studentSelector } from "./state/selectors/student.selector";
+import { map, Observable } from "rxjs";
+import { Store } from "@ngrx/store";
 
 @Injectable({
   providedIn: "root"
 })
 export class ExcellentStudentGuard implements CanActivate {
-  private students: Student[] = [];
-  private isExcellent: boolean = false;
-  constructor(private dataClientService: DataClientService) {
+  constructor(private _store: Store) {
   }
-  canActivate(
-    route: ActivatedRouteSnapshot,
-    state: RouterStateSnapshot): boolean {
-    this.students = this.dataClientService.getData();
-    this.isExcellent = false;
-    this.students.forEach((item) => {
-      if (item.id === Number(route.queryParams["id"])){
-        if (item.averageScore === 5){
-          this.isExcellent = true;
-          alert("Запись защищена");
+  canActivate( route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<boolean> {
+    return this._store.select(studentSelector).pipe(
+      map((data) => {
+        for (const item of data){
+          if ((item.id === Number(route.queryParams["id"])) && (item.averageScore === 5)){
+            alert("Запись защищена");
+            return false;
+          }
         }
-      }
-    });
-    return !this.isExcellent;
+        return true;
+      }),
+    );
   }
 }
